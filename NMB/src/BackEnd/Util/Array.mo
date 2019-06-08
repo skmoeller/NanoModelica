@@ -1,7 +1,7 @@
 package Array
 "
 Brief:
-This package contains all functions that operate on the Array type.
+This package contains all functions that operate on the Array type. test
 "
 
 import MetaModelica.Dangerous.{arrayGetNoBoundsChecking, arrayUpdateNoBoundsChecking, arrayCreateNoInit};
