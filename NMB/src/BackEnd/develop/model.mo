@@ -7,43 +7,58 @@ package Main
   import DumpDAE; 
   import ConvDAE_List;
   import Data;
-  import Matching;
+  import BackendDAEUtil;
   
   function main
       output String msg1 = "";
   protected
-    DAE_List.AdjacencyMatrix tempData1;
-    DAE.AdjacencyMatrix data1;
-    array<Integer> a1, a2;
-    DAE.Matching matching;
+    DAE_List.VariableArray tempData1;
+    DAE_List.EquationArray tempData2;
+    DAE.VariableArray data1;
+    DAE.EquationArray data2;
+    DAE.AdjacencyMatrix result1;
+    DAE.AdjacencyMatrix result2;
     String msg = "";
     Integer i;
   algorithm
+  
   // Daten laden und konvertieren.
-    tempData1 := Data.getModel();
-    data1 := ConvDAE_List.convAdjacencyMatrix(tempData1);
+    (tempData1, tempData2) := Data.getModel();
+    data1 := ConvDAE_List.convVariableArray(tempData1);
+    data2 := ConvDAE_List.convEquationArray(tempData2);
     
-  // Programmieren Sie die Funktion Matching.PerfectMatching(...).  
-    matching := Matching.PerfectMatching(data1);
-
+  // Programmieren Sie die Funktion BackendDAEUtil.adjacencyMatrix(...).  
+    (result1, result2) := BackendDAEUtil.adjacencyMatrix(data1, data2);
+    
   // Diese Zeichenkette wird mit einer erwarteten verglichen. Stimmen sie
   // überein, so haben Sie die Funktion vermutlich richtig implementiert.
-  // Erzeugen Sie zusätzlich eigene Beispiele, um Ihre Funktion zu testen!    
-    msg1 := DumpDAE.dumpMatching(matching);    
-  
-  // Ergebnisse anzeigen (einfache Kontrollausgabe)    
-    DAE.MATCHING(variableAssign = a1, equationAssign = a2) := matching;
+  // Erzeugen Sie zusätzlich eigene Beispiele, um Ihre Funktion zu testen!
+    msg1 := DumpDAE.dumpAdjacencyMatrix(result1) + "\n";
+    msg1 := msg1 + DumpDAE.dumpAdjacencyMatrix(result2);
+    
+  // Ergebnisse anzeigen (einfache Kontrollausgabe) 
     i := 1;
-    for idx in a1 loop
-      msg := msg + "var["+ String(i) +"] solved by equ " + String(idx) + "\n";
-      i := i+1;
+    for r in result1 loop
+      msg := msg + "Eqn " + String(i) + " : ";
+      i := i + 1;
+      for c in r loop
+        msg := msg + String(c) + " ";
+      end for;
+      msg := msg + "\n";
     end for;
-    msg := msg + "\n";
+    msg := msg +"\n";
+
     i := 1;
-    for idx in a2 loop
-      msg := msg + "eqn["+ String(i) +"] solves var " + String(idx) + "\n";
-      i := i+1;
-    end for;      
+    for r in result2 loop
+      msg := msg + "Var " + String(i) + " : ";
+      i := i + 1;
+      for c in r loop
+        msg := msg + String(c) + " ";
+      end for;
+      msg := msg + "\n";
+    end for;
+    msg := msg +"\n";
+    
     print(msg);
   end main;    
      
