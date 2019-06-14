@@ -71,7 +71,7 @@ protected
     list<DAE.CREF_INDEX>lcref;
 
   algorithm
-    h:=hash(inVar);
+    h:=hash(inVar);//Exist it???
 
 
 
