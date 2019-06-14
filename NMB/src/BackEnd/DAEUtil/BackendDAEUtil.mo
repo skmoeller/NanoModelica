@@ -39,6 +39,7 @@ algorithm
     outAdjacencyMatrix[i]:=setListAdjacency(inVariables,inEquations.equations[i]);
   end
 
+
 end adjacencyMatrix;
 
 /*
@@ -54,7 +55,7 @@ protected
     output list<int> outlist;
 
   protected
-    
+
   algorithm
 
 
@@ -70,7 +71,7 @@ protected
     list<DAE.CREF_INDEX>lcref;
 
   algorithm
-    h:=has
+    h:=hash(inVar);
 
 
 
