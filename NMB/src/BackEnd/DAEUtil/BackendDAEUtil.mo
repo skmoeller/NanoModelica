@@ -32,7 +32,7 @@ public function adjacencyMatrix
 protected
 Integer i;
 algorithm
-  for i form 1 to inEquations.size loop
+  for i in 1:inEquations.size loop
     outAdjacencyMatrix[i]:=setListAdjacency(inVariables,inEquations.equations[i]);
   end
   outAdjacencyMatrixT:=adjacencyTranspose(outAdjacencyMatrix);
@@ -56,22 +56,33 @@ protected
   protected
 
   algorithm
-    outlist:=treeSearch(DAE.UNARY(DAE.SUB(inEqn.lhs,inEqn.rhs)));
+    outlist:=treeSearch(DAE.UNARY(DAE.SUB(inEqn.lhs,inEqn.rhs)),inVar);
   end setListAdjacency;
 
   function treeSearch
     input DAE.Exp inEqn;
-    output list<DAE.ComponentRef> lcref; //Hash function for index in another function
+    input DAE.VariableArray inVar;
+    output list<int> lIndx;
+
+  protected
+    Integer indx;
 
   algorithm
-    lcref:={};
+    lIndx:={};
     _ := match()
-      local Exp a,b;
-      DAE.ComponentRef v;
+      local DAE.Exp a,b;
+            DAE.ComponentRef v;
     case DAE.CREF(v) then
-      lcref:=v::lcref;
+      (indx,_):=BackendVariable.getVariableByCref(v,inVar);
+      lIndx:=addIndx2list(indx::lIndx,indx);
     case DAE.CALL(_,a) then
-      /*Smart Stuff for expression list*/
+      _:match a
+       local DAE.Exp lvar;
+             list<DAE.Exp> restlist;
+       case lvar::restlist then
+         treeSearch(lavar);
+       else then "";
+       end match;
     case DAE.BINARY(a,_,b) then
       treeSearch(a);
       treeSearch(b);
@@ -80,8 +91,28 @@ protected
     else then "";
     end match;
 
-
   end treeSearch
+
+  function addIndx2list
+    input list<Integer> inlindx;
+    input Integer indx;
+    output list<Integer> outlindx;
+
+  protected
+    array<Integer> indxArray;
+    Integer val;
+    Integer iterationVar;
+  algorithm
+    indxArray:=listArray(inlindx);
+    for i in 2 to arrayLength(indxArray)
+       val:=indxArray[i];
+       iterationVar:=i;
+       while j>1 and A[iterationVar-1]>val loop
+         indxArray[iterationVar]:=indxArray[iterationVar-1];
+         iterationVar:=iterationVar-1;
+       end;
+       indxArray[iterationVar]:=val; /*Check equality*/ 
+  end addIndx2list;
 
 
 end BackendDAEUtil;
