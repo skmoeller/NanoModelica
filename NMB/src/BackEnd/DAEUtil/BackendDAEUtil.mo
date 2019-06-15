@@ -74,7 +74,9 @@ protected
             DAE.ComponentRef v;
     case DAE.CREF(v) then
       (indx,_):=BackendVariable.getVariableByCref(v,inVar);
-      lIndx:=addIndx2list(indx::lIndx,indx);
+      if not listMember(indx,lIndx) then
+        lIndx:=addIndx2list(indx::lIndx,indx);
+      end;
     case DAE.CALL(_,a) then
       _:match a
        local DAE.Exp lvar;
@@ -93,13 +95,14 @@ protected
 
   end treeSearch
 
-  function addIndx2list
+  function addIndx2list /*Insertion Sort*/
     input list<Integer> inlindx;
     input Integer indx;
     output list<Integer> outlindx;
 
   protected
     array<Integer> indxArray;
+    list<Integer> restlist;
     Integer val;
     Integer iterationVar;
   algorithm
@@ -111,7 +114,9 @@ protected
          indxArray[iterationVar]:=indxArray[iterationVar-1];
          iterationVar:=iterationVar-1;
        end;
-       indxArray[iterationVar]:=val; /*Check equality*/ 
+      indxArray[iterationVar]:=val;
+      outlindx:=arrayList(indxArray);
+     end;
   end addIndx2list;
 
 
