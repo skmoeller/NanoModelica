@@ -104,6 +104,7 @@ protected
     array<Integer> indxArray;
     list<Integer> restlist;
     Integer val;
+    Integer helpVal;
     Integer iterationVar;
   algorithm
     indxArray:=listArray(inlindx);
@@ -111,7 +112,9 @@ protected
        val:=indxArray[i];
        iterationVar:=i;
        while j>1 and A[iterationVar-1]>val loop
+         helpVal:=indxArray[iterationVar];
          indxArray[iterationVar]:=indxArray[iterationVar-1];
+         indxArray[iterationVar-1]:=helpVal;
          iterationVar:=iterationVar-1;
        end;
       indxArray[iterationVar]:=val;
