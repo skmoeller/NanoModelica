@@ -122,5 +122,14 @@ protected
      end;
   end addIndx2list;
 
+function adjacencyTranspose
+  input DAE.AdjacencyMatrix inAdjacency;
+  output DAE.AdjacencyMatrix outAdjacency;
+
+protected
+
+algorithm
+  /*TODO: ADD some smart stuff here*/
+end adjacencyTranspose;
 
 end BackendDAEUtil;
