@@ -21,8 +21,7 @@ public
 /******************************************************************
  stuff to calculate Adjacency matrix
 ******************************************************************/
-
-public function adjacencyMatrix
+function adjacencyMatrix
 "
 "
   input DAE.VariableArray inVariables;
