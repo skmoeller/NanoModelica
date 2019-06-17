@@ -59,9 +59,12 @@ protected
     input Integer sizeEquations;
     output list<Integer> outList;
     output DAE.AdjacencyMatrix outAdjacencyMatrixT;
+  protected
+    DAE.Exp eqnExp;
   algorithm
     outAdjacencyMatrixT:=arrayCreate(sizeEquations,{});
-    (outList,outAdjacencyMatrixT):=getList(DAE.BINARY(inEqn.lhs,DAE.SUB(),inEqn.rhs),inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
+    eqnExp:=DAE.BINARY(inEqn.lhs,DAE.SUB(),inEqn.rhs);
+    (outList,outAdjacencyMatrixT):=getList(eqnExp,inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
   end setListAdjacency;
 
   function getList
@@ -74,40 +77,45 @@ protected
     output DAE.AdjacencyMatrix outAdjacencyMatrixT;
   protected
     Integer indx;
+    list<DAE.ComponentRef> crefs;
   algorithm
     outAdjacencyMatrixT:=arrayCreate(sizeEquations,{});
     lIndx:={};
-    _:=match(inEqn)
-      local DAE.Exp exp1,exp2;
-            DAE.ComponentRef cref;
-            list<DAE.Exp> lExp;
-    case DAE.CREF(cref)
-      algorithm
-      (indx,_):=BackendVariable.getVariableByCref(cref,inVar);
+
+    crefs:=treeSearch(inEqn);
+    for i in crefs loop
+      (indx,_):=BackendVariable.getVariableByCref(i,inVar);
       if not listMember(indx,lIndx) then
         lIndx:=addIndx2list(indx::lIndx,indx);
         outAdjacencyMatrixT:=setAdjacencyTranspose(inAdjacencyMatrixT,equationIndex,indx,sizeEquations);
       end if;
-      then "";
+    end for;
+  end getList;
+
+  function treeSearch
+    input DAE.Exp inEqn;
+    output list<DAE.ComponentRef> c;
+  algorithm
+    c:=match(inEqn)
+      local DAE.Exp exp1,exp2;
+            DAE.ComponentRef cref;
+            list<DAE.Exp> lExp;
+    case DAE.CREF(cref)
+      then cref::c;
     case DAE.CALL(_,lExp)
       algorithm
-        for expression in lExp loop
-          getList(expression,inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
-        end for;
-        then"";
-    case DAE.BINARY(exp1,_,exp2)
-      algorithm
-      getList(exp1,inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
-      getList(exp2,inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
-      then"";
-    case DAE.UNARY(_,exp1)
-      algorithm
-      getList(exp1,inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
-      then "";
-    else then "";
+        exp1:=listGet(lExp,1);
+        _:=match(lExp)
+          local DAE.Exp exp;
+                list<DAE.Exp> lexp;
+        case exp::lexp then treeSearch(exp);
+      end match;
+      then treeSearch(exp1);
+    case DAE.BINARY(exp1,_,exp2) then listAppend(treeSearch(exp1),treeSearch(exp2));
+    case DAE.UNARY(_,exp1) then treeSearch(exp1);
     end match;
 
-  end getList;
+  end treeSearch;
 
   function addIndx2list
     input list<Integer> inlindx;
