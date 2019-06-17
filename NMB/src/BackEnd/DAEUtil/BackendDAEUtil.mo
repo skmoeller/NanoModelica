@@ -29,10 +29,15 @@ function adjacencyMatrix
   output DAE.AdjacencyMatrix outAdjacencyMatrix;
   output DAE.AdjacencyMatrix outAdjacencyMatrixT;
 protected
-Integer i;
+  list<Integer>listVariables;
+  Integer sizeEquations;
 algorithm
+  sizeEquations:=inEquations.size;
+  outAdjacencyMatrix:=arrayCreate(sizeEquations,{});
+  outAdjacencyMatrixT:=arrayCreate(sizeEquations,{});
   for i in inEquations.size:-1:1 loop
-    (outAdjacencyMatrix[i],outAdjacencyMatrixT):=setListAdjacency(inVariables,inEquations.equations[i],i);
+    (listVariables,outAdjacencyMatrixT):=setListAdjacency(inVariables,inEquations.equations[i],i,outAdjacencyMatrixT,sizeEquations);
+    outAdjacencyMatrix[i]:=listVariables;
   end for;
 end adjacencyMatrix;
 
@@ -50,26 +55,29 @@ protected
     input DAE.VariableArray inVar;
     input DAE.Equation inEqn;
     input Integer equationIndex;
-    output list<Integer> outlist;
-    output DAE.AdjacencyMatrix matrixTranspose;
-
-  protected
-
+    input DAE.AdjacencyMatrix inAdjacencyMatrixT;
+    input Integer sizeEquations;
+    output list<Integer> outList;
+    output DAE.AdjacencyMatrix outAdjacencyMatrixT;
   algorithm
-    (outlist,matrixTranspose):=treeSearch(DAE.BINARY(inEqn.lhs,DAE.SUB(),inEqn.rhs),inVar,equationIndex);
+    outAdjacencyMatrixT:=arrayCreate(sizeEquations,{});
+    (outList,outAdjacencyMatrixT):=getList(DAE.BINARY(inEqn.lhs,DAE.SUB(),inEqn.rhs),inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
   end setListAdjacency;
 
-  function treeSearch
+  function getList
     input DAE.Exp inEqn;
     input DAE.VariableArray inVar;
     input Integer equationIndex;
-    output list<Integer> lIndx;                   /*Another Function!!!*/
-    output DAE.AdjacencyMatrix matrixTranspose;
+    input DAE.AdjacencyMatrix inAdjacencyMatrixT;
+    input Integer sizeEquations;
+    output list<Integer> lIndx;
+    output DAE.AdjacencyMatrix outAdjacencyMatrixT;
   protected
     Integer indx;
   algorithm
+    outAdjacencyMatrixT:=arrayCreate(sizeEquations,{});
     lIndx:={};
-    _:= match(inEqn)
+    _:=match(inEqn)
       local DAE.Exp exp1,exp2;
             DAE.ComponentRef cref;
             list<DAE.Exp> lExp;
@@ -78,26 +86,28 @@ protected
       (indx,_):=BackendVariable.getVariableByCref(cref,inVar);
       if not listMember(indx,lIndx) then
         lIndx:=addIndx2list(indx::lIndx,indx);
-        matrixTranspose:=setAdjacencyTranspose(matrixTranspose,equationIndex,indx);
+        outAdjacencyMatrixT:=setAdjacencyTranspose(inAdjacencyMatrixT,equationIndex,indx,sizeEquations);
       end if;
       then "";
     case DAE.CALL(_,lExp)
       algorithm
         for expression in lExp loop
-          treeSearch(expression,inVar,equationIndex);
+          getList(expression,inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
         end for;
-        then "";
+        then"";
     case DAE.BINARY(exp1,_,exp2)
       algorithm
-      treeSearch(exp1,inVar,equationIndex);
-      treeSearch(exp2,inVar,equationIndex);
+      getList(exp1,inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
+      getList(exp2,inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
+      then"";
+    case DAE.UNARY(_,exp1)
+      algorithm
+      getList(exp1,inVar,equationIndex,inAdjacencyMatrixT,sizeEquations);
       then "";
-    case DAE.UNARY(_,exp1) then
-      treeSearch(exp1,inVar,equationIndex);
     else then "";
     end match;
 
-  end treeSearch;
+  end getList;
 
   function addIndx2list
     input list<Integer> inlindx;
@@ -127,14 +137,14 @@ protected
   end addIndx2list;
 
 function setAdjacencyTranspose
-  input DAE.AdjacencyMatrix inAdjacencyMatrix;
+  input DAE.AdjacencyMatrix inAdjacency;
   input Integer equationIndex;
   input Integer variableIndex;
+  input Integer sizeEquations;
   output DAE.AdjacencyMatrix outAdjacency;
-protected
-
 algorithm
-    outAdjacency[variableIndex]:=equationIndex::inAdjacencyMatrix[variableIndex];
+  outAdjacency:=arrayCreate(sizeEquations,{});
+  outAdjacency[variableIndex]:=equationIndex::inAdjacency[variableIndex];
   end setAdjacencyTranspose;
 
 end BackendDAEUtil;
