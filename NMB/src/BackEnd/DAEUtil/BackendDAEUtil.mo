@@ -71,7 +71,7 @@ protected
     lIndx:={};
     _ := match()
       local DAE.Exp a,b;
-            DAE.ComponentRef v
+            DAE.ComponentRef v;
     case DAE.CREF(v) then
       (indx,_):=BackendVariable.getVariableByCref(v,inVar);
       if not listMember(indx,lIndx) then
