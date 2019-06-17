@@ -50,53 +50,54 @@ protected
     input DAE.VariableArray inVar;
     input DAE.Equation inEqn;
     input Integer equationIndex;
-    output list<int> outlist;
+    output list<Integer> outlist;
     output DAE.AdjacencyMatrix matrixTranspose;
 
   protected
 
   algorithm
-    (outlist,matrixTranspose):=treeSearch(DAE.UNARY(DAE.SUB(inEqn.lhs,inEqn.rhs)),inVar,equationIndex);
+    (outlist,matrixTranspose):=treeSearch(DAE.BINARY(inEqn.lhs,DAE.SUB(),inEqn.rhs),inVar,equationIndex);
   end setListAdjacency;
 
   function treeSearch
     input DAE.Exp inEqn;
     input DAE.VariableArray inVar;
     input Integer equationIndex;
-    output list<int> lIndx;
+    output list<Integer> lIndx;
     output DAE.AdjacencyMatrix matrixTranspose;
   protected
     Integer indx;
   algorithm
     lIndx:={};
-    _ := match(inEqn)
-      local DAE.Exp a,b;
+    _:= match(inEqn)
+      local DAE.Exp exp1,exp2;
             DAE.ComponentRef cref;
+            list<DAE.Exp> lExp; 
     case DAE.CREF(cref)
       algorithm
       (indx,_):=BackendVariable.getVariableByCref(cref,inVar);
       if not listMember(indx,lIndx) then
         lIndx:=addIndx2list(indx::lIndx,indx);
-        MatrixTranspose:=setAdjacencyTranspose(matrixTranspose,equationIndex,indx);
+        matrixTranspose:=setAdjacencyTranspose(matrixTranspose,equationIndex,indx);
       end if;
       then "";
-    case DAE.CALL(_,a)
+    case DAE.CALL(_,lExp)
       algorithm
-      _:=match(a)
-       local DAE.Exp lvar;
-             list<DAE.Exp> restlist;
-       case lvar::restlist then
-         treeSearch(lavar);
+      _:=match(lExp)
+        local DAE.Exp lexp;
+              list<DAE.Exp> restlist;
+      case lexp::restlist then
+        treeSearch(lexp,inVar,equationIndex);
        else then "";
        end match;
        then "";
-    case DAE.BINARY(a,_,b)
+    case DAE.BINARY(exp1,_,exp2)
       algorithm
-      treeSearch(a);
-      treeSearch(b);
+      treeSearch(exp1,inVar,equationIndex);
+      treeSearch(exp2,inVar,equationIndex);
       then "";
-    case DAE.UNARY(_,a) then
-      treeSearch(a);
+    case DAE.UNARY(_,exp1) then
+      treeSearch(exp1,inVar,equationIndex);
     else then "";
     end match;
 
@@ -115,10 +116,10 @@ protected
     Integer iterationVar;
   algorithm
     indxArray:=listArray(inlindx);
-    for i in 2 to arrayLength(indxArray)
+    for i in 2:arrayLength(indxArray) loop
        val:=indxArray[i];
        iterationVar:=i;
-       while j>1 and A[iterationVar-1]>val loop
+       while iterationVar>1 and indxArray[iterationVar-1]>val loop
          helpVal:=indxArray[iterationVar];
          indxArray[iterationVar]:=indxArray[iterationVar-1];
          indxArray[iterationVar-1]:=helpVal;
@@ -137,12 +138,7 @@ function setAdjacencyTranspose
 protected
 
 algorithm
-    outAdjacency[variableIndex]:=equationIndex::outAdjacency[variableIndex];
-  end setadjacencyTranspose;
+    outAdjacency[variableIndex]:=equationIndex::inAdjacencyMatrix[variableIndex];
+  end setAdjacencyTranspose;
 
 end BackendDAEUtil;
-
-
-
-
- end match;
