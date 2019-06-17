@@ -134,3 +134,5 @@ protected
 algorithm
     outAdjacency[variableIndex]:=equationIndex::outAdjacency[variableIndex];
   end setadjacencyTranspose;
+
+end BackendDAEUtil;
