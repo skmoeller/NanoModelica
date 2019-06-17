@@ -81,7 +81,7 @@ protected
       end if;
       then "";
     case DAE.CALL(_,a)
-    algorithm
+      algorithm
       _:=match(a)
        local DAE.Exp lvar;
              list<DAE.Exp> restlist;
@@ -90,9 +90,11 @@ protected
        else then "";
        end match;
        then "";
-    case DAE.BINARY(a,_,b) then
+    case DAE.BINARY(a,_,b)
+      algorithm
       treeSearch(a);
       treeSearch(b);
+      then "";
     case DAE.UNARY(_,a) then
       treeSearch(a);
     else then "";
