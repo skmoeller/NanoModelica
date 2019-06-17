@@ -80,7 +80,8 @@ protected
         MatrixTranspose:=setAdjacencyTranspose(matrixTranspose,equationIndex,indx);
       end if;
       then "";
-    case DAE.CALL(_,a) then
+    case DAE.CALL(_,a)
+    algorithm
       _:=match(a)
        local DAE.Exp lvar;
              list<DAE.Exp> restlist;
@@ -88,6 +89,7 @@ protected
          treeSearch(lavar);
        else then "";
        end match;
+       then "";
     case DAE.BINARY(a,_,b) then
       treeSearch(a);
       treeSearch(b);
