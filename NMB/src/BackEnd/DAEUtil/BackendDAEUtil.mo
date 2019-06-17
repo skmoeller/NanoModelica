@@ -77,7 +77,7 @@ protected
       (indx,_):=BackendVariable.getVariableByCref(cref,inVar);
       if not listMember(indx,lIndx) then
         lIndx:=addIndx2list(indx::lIndx,indx);
-        MatrixTranspose:=setAdjacencyTranspose(matrixTranspose,equationIndex,indx)
+        MatrixTranspose:=setAdjacencyTranspose(matrixTranspose,equationIndex,indx);
       end if;
       then "";
     case DAE.CALL(_,a) then
