@@ -81,7 +81,7 @@ protected
       end if;
       then "";
     case DAE.CALL(_,a) then
-      _:match a
+      _:match(a)
        local DAE.Exp lvar;
              list<DAE.Exp> restlist;
        case lvar::restlist then
