@@ -31,7 +31,7 @@ function adjacencyMatrix
 protected
 Integer i;
 algorithm
-  for i in inEquations.size loop:-1:1 loop
+  for i in inEquations.size:-1:1 loop
     (outAdjacencyMatrix[i],outAdjacencyMatrixT):=setListAdjacency(inVariables,inEquations.equations[i],i);
   end for;
 end adjacencyMatrix;
