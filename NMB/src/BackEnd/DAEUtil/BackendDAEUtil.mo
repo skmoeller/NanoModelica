@@ -100,9 +100,9 @@ protected
     else then "";
     end match;
 
-  end treeSearch
+  end treeSearch;
 
-  function addIndx2list /*Insertion Sort*/
+  function addIndx2list
     input list<Integer> inlindx;
     input Integer indx;
     output list<Integer> outlindx;
