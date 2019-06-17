@@ -32,10 +32,9 @@ public function adjacencyMatrix
 protected
 Integer i;
 algorithm
-  for i in 1:inEquations.size loop
-    outAdjacencyMatrix[i]:=setListAdjacency(inVariables,inEquations.equations[i]);
-  end
-  outAdjacencyMatrixT:=adjacencyTranspose(outAdjacencyMatrix);
+  for i in inEquations.size loop:-1:1 loop
+    (outAdjacencyMatrix[i],outAdjacencyMatrixT):=setListAdjacency(inVariables,inEquations.equations[i],i);
+  end for;
 end adjacencyMatrix;
 
 /*
@@ -51,22 +50,24 @@ protected
   function setListAdjacency
     input DAE.VariableArray inVar;
     input DAE.Equation inEqn;
+    input Integer equationIndex;
     output list<int> outlist;
+    output DAE.AdjacencyMatrix matrixTranspose;
 
   protected
 
   algorithm
-    outlist:=treeSearch(DAE.UNARY(DAE.SUB(inEqn.lhs,inEqn.rhs)),inVar);
+    (outlist,matrixTranspose):=treeSearch(DAE.UNARY(DAE.SUB(inEqn.lhs,inEqn.rhs)),inVar,equationIndex);
   end setListAdjacency;
 
   function treeSearch
     input DAE.Exp inEqn;
     input DAE.VariableArray inVar;
+    input Integer equationIndex;
     output list<int> lIndx;
-
+    output DAE.AdjacencyMatrix matrixTranspose;
   protected
     Integer indx;
-
   algorithm
     lIndx:={};
     _ := match()
@@ -76,7 +77,8 @@ protected
       (indx,_):=BackendVariable.getVariableByCref(v,inVar);
       if not listMember(indx,lIndx) then
         lIndx:=addIndx2list(indx::lIndx,indx);
-      end;
+        MatrixTranspose:=setAdjacencyTranspose(matrixTranspose,equationIndex,indx)
+      end if;
     case DAE.CALL(_,a) then
       _:match a
        local DAE.Exp lvar;
@@ -116,20 +118,19 @@ protected
          indxArray[iterationVar]:=indxArray[iterationVar-1];
          indxArray[iterationVar-1]:=helpVal;
          iterationVar:=iterationVar-1;
-       end;
+       end while;
       indxArray[iterationVar]:=val;
       outlindx:=arrayList(indxArray);
-     end;
+    end for;
   end addIndx2list;
 
-function adjacencyTranspose
-  input DAE.AdjacencyMatrix inAdjacency;
+function setAdjacencyTranspose
+  input DAE.AdjacencyMatrix inAdjacencyMatrix;
+  input Integer equationIndex;
+  input Integer variableIndex;
   output DAE.AdjacencyMatrix outAdjacency;
-
 protected
 
 algorithm
-  /*TODO: ADD some smart stuff here*/
-end adjacencyTranspose;
-
-end BackendDAEUtil;
+    outAdjacency[variableIndex]:=equationIndex::outAdjacency[variableIndex];
+  end setadjacencyTranspose;
