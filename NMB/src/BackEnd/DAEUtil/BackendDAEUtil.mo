@@ -69,15 +69,17 @@ protected
     Integer indx;
   algorithm
     lIndx:={};
-    _ := match()
+    _ := match(inEqn)
       local DAE.Exp a,b;
-            DAE.ComponentRef v;
-    case DAE.CREF(v) then
-      (indx,_):=BackendVariable.getVariableByCref(v,inVar);
+            DAE.ComponentRef cref;
+    case DAE.CREF(cref)
+      algorithm
+      (indx,_):=BackendVariable.getVariableByCref(cref,inVar);
       if not listMember(indx,lIndx) then
         lIndx:=addIndx2list(indx::lIndx,indx);
         MatrixTranspose:=setAdjacencyTranspose(matrixTranspose,equationIndex,indx)
       end if;
+      then "";
     case DAE.CALL(_,a) then
       _:match a
        local DAE.Exp lvar;
@@ -90,7 +92,7 @@ protected
       treeSearch(a);
       treeSearch(b);
     case DAE.UNARY(_,a) then
-        treeSearch(a);
+      treeSearch(a);
     else then "";
     end match;
 
@@ -135,3 +137,8 @@ algorithm
   end setadjacencyTranspose;
 
 end BackendDAEUtil;
+
+
+
+
+ end match;
