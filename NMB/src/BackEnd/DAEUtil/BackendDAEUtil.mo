@@ -72,7 +72,7 @@ protected
     _:= match(inEqn)
       local DAE.Exp exp1,exp2;
             DAE.ComponentRef cref;
-            list<DAE.Exp> lExp; 
+            list<DAE.Exp> lExp;
     case DAE.CREF(cref)
       algorithm
       (indx,_):=BackendVariable.getVariableByCref(cref,inVar);
@@ -83,11 +83,8 @@ protected
       then "";
     case DAE.CALL(_,lExp)
       algorithm
-      _:=match(lExp)
-        local DAE.Exp lexp;
-              list<DAE.Exp> restlist;
-      case lexp::restlist then
-        treeSearch(lexp,inVar,equationIndex);
+        for expression in lExp loop
+          treeSearch(expression,inVar,equationIndex);
        else then "";
        end match;
        then "";
