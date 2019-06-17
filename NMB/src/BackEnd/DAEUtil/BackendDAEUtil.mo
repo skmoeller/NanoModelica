@@ -63,7 +63,7 @@ protected
     input DAE.Exp inEqn;
     input DAE.VariableArray inVar;
     input Integer equationIndex;
-    output list<Integer> lIndx;
+    output list<Integer> lIndx;                   /*Another Function!!!*/
     output DAE.AdjacencyMatrix matrixTranspose;
   protected
     Integer indx;
@@ -85,9 +85,8 @@ protected
       algorithm
         for expression in lExp loop
           treeSearch(expression,inVar,equationIndex);
-       else then "";
-       end match;
-       then "";
+        end for;
+        then "";
     case DAE.BINARY(exp1,_,exp2)
       algorithm
       treeSearch(exp1,inVar,equationIndex);
