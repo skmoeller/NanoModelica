@@ -162,7 +162,7 @@ protected
   list<Integer> list;
 algorithm
   list:=variableList;
-  outAdjacencyT:=arrayCreate(sizeEquations,{});
+  outAdjacencyT:=inAdjacencyT;
   while listLength(list)>0 loop
     list:=match(variableList)
       local Integer var;
