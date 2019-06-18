@@ -99,8 +99,8 @@ protected
             DAE.ComponentRef cref;
     case DAE.BINARY(exp1,_,exp2)
     algorithm
-      outListCrefs:=treeSearch(exp1,inListCrefs);
-      outListCrefs:=treeSearch(exp2,outListCrefs);
+      outListCrefs:=treeSearch(exp2,inListCrefs);
+      outListCrefs:=treeSearch(exp1,outListCrefs);
       then "";
     case DAE.UNARY(_,exp1)
     algorithm
