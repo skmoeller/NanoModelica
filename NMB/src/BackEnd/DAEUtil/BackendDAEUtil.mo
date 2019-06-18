@@ -116,8 +116,9 @@ protected
           algorithm
             outListCrefs:=treeSearch(expr,inListCrefs);
           then lexpr;
+          else then {};
+          end match;
         end while;
-      end match;
     then "";
     case DAE.CREF(cref)
      algorithm
