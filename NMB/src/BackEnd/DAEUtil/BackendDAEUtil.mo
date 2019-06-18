@@ -76,7 +76,7 @@ protected
       case c::lc
       algorithm
         (indx,_):=BackendVariable.getVariableByCref(c,inVar);
-        if indx>0 then
+        if indx>=0 then
           if not listMember(indx,lIndx) then
             /*lIndx:=addIndx2list(indx::lIndx);*/
             lIndx:=indx::lIndx;
