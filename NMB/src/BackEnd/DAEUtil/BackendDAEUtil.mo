@@ -55,12 +55,11 @@ protected
     input DAE.Equation inEqn;
     output list<Integer> outList;
   algorithm
-    outList:=getList(inEqn.lhs,inEqn.rhs,inVar);
+    outList:=getList(DAE.BINARY(inEqn.lhs,DAE.SUB(),inEqn.rhs),inVar);
   end setAdjacency;
 
   function getList
-    input DAE.Exp lhs;
-    input DAE.Exp rhs;
+    input DAE.Exp inEqn;
     input DAE.VariableArray inVar;
     output list<Integer> lIndx;
   protected
@@ -69,8 +68,7 @@ protected
   algorithm
     lIndx:={};
     crefs:={};
-    crefs:=treeSearch(lhs,crefs);
-    crefs:=crefs::treeSearch(rhs,crefs);
+    crefs:=treeSearch(inEqn,crefs);
     while listLength(crefs)>0 loop
     crefs:=match(crefs)
     local list<DAE.ComponentRef> lc;
@@ -110,13 +108,15 @@ protected
       then "";
     case DAE.CALL(_,lExp)
       algorithm
-        _:=match(lExp)
-          local DAE.Exp expr;
-                list<DAE.Exp> lexpr;
-        case expr::lexpr
+        while listLength(lExp)>0 loop
+          lExp:=match(lExp)
+            local DAE.Exp expr;
+                  list<DAE.Exp> lexpr;
+          case expr::lexpr
           algorithm
             outListCrefs:=treeSearch(expr,inListCrefs);
-          then "";
+          then lexpr;
+        end while;
       end match;
     then "";
     case DAE.CREF(cref)
