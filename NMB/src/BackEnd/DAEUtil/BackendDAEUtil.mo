@@ -36,7 +36,7 @@ algorithm
   for i in inEquations.size:-1:1 loop
     iterVar:=i;
     outAdjacencyMatrix[iterVar]:=setAdjacency(inVariables,inEquations.equations[iterVar]);
-   // outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[iterVar],iterVar,sizeEquations);
+    outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[iterVar],iterVar,sizeEquations);
   end for;
 end adjacencyMatrix;
 
@@ -69,6 +69,7 @@ protected
     lIndx:={};
     crefs:={};
     crefs:=treeSearch(inEqn,crefs);
+    print(String(lenghtList(crefs)));
     _:=match(crefs)
     local list<DAE.ComponentRef> lc;
           DAE.ComponentRef c;
@@ -124,27 +125,31 @@ protected
   end treeSearch;
 
   function addIndx2list
-    input list<Integer> inlindx;
+    input list<Integer> inLIndx;
     input Integer indx;
-    output list<Integer> outlindx;
+    output list<Integer> outLIndx;
   protected
-    array<Integer> indxArray;
-    list<Integer> restlist;
+    list<Integer> list;
+    array<Integer>array:=listArray(inLIndx);
     Integer val,helpVar,iterVar;
   algorithm
-    indxArray:=listArray(inlindx);
-    for i in 2:arrayLength(indxArray) loop
-       val:=indxArray[i];
-       iterVar:=i;
-       while iterVar>1 and indxArray[iterVar-1]>val loop
-         helpVar:=indxArray[iterVar];
-         indxArray[iterVar]:=indxArray[iterVar-1];
-         indxArray[iterVar-1]:=helpVar;
-         iterVar:=iterVar-1;
-       end while;
-      indxArray[iterVar]:=val;
-      outlindx:=arrayList(indxArray);
-    end for;
+    list:=inLIndx;
+    if listLength(inLIndx)<2 then
+      outLIndx:=inLIndx;
+    else
+      for i in 2:listLength(inLIndx) loop
+        iterVar:=i;
+        val:=listGet(list,iterVar);
+        while iterVar>1 and listGet(list,iterVar-1)>val loop
+          helpVar:=listGet(list,(iterVar+0));
+          array[(iterVar+0)]:=listGet(list,(iterVar-1));
+          indxArray[iterVar-1]:=helpVar;
+          iterVar:=iterVar-1;
+        end while;
+        indxArray[(iterVar+0)]:=val;
+        outlindx:=arrayList(indxArray);
+      end for;
+    end if;
   end addIndx2list;
 
 function setAdjacencyT
