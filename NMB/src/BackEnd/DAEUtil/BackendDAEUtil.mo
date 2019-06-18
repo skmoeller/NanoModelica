@@ -35,11 +35,11 @@ algorithm
   sizeEquations:=inEquations.size;
   outAdjacencyMatrix:=arrayCreate(sizeEquations,{});
   outAdjacencyMatrixT:=arrayCreate(sizeEquations,{});
-  /*for i in inEquations.size:-1:1 loop
+  for i in inEquations.size:-1:1 loop
     iterVar:=i;
     outAdjacencyMatrix[iterVar]:=setAdjacency(inVariables,inEquations.equations[iterVar]);
     outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[iterVar],iterVar,sizeEquations);
-  end for;*/
+  end for;
 end adjacencyMatrix;
 
 /*
@@ -91,7 +91,7 @@ protected
     output list<DAE.ComponentRef> outListCrefs;
   algorithm
     _:=match(inEqn)
-      local DAE.Exp exp1,exp2;
+      local DAE.Exp exp1;
             list<DAE.Exp> lExp;
             DAE.ComponentRef cref;
     case DAE.CREF(cref)
@@ -109,10 +109,13 @@ protected
           then "";
       end match;
     then "";
-    case DAE.BINARY(exp1,_,exp2)
+    case DAE.BINARY(exp1,_,_)
       algorithm
         outListCrefs:=treeSearch(exp1,inListCrefs);
-        outListCrefs:=treeSearch(exp2,inListCrefs);
+      then "";
+    case DAE.BINARY(_,_,exp1)
+      algorithm
+        outListCrefs:=treeSearch(exp1,inListCrefs);
       then "";
     case DAE.UNARY(_,exp1)
       algorithm
