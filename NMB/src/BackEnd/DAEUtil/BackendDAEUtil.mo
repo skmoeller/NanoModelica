@@ -69,7 +69,6 @@ protected
     lIndx:={};
     crefs:={};
     crefs:=treeSearch(inEqn,crefs);
-    print(String(lenghtList(crefs)));
     _:=match(crefs)
     local list<DAE.ComponentRef> lc;
           DAE.ComponentRef c;
@@ -77,7 +76,7 @@ protected
       algorithm
         (indx,_):=BackendVariable.getVariableByCref(c,inVar);
         if not listMember(indx,lIndx) then
-          lIndx:=addIndx2list(indx::lIndx,indx);
+         /* lIndx:=addIndx2list(indx::lIndx,indx);*/
         end if;
       then "";
       else then "";
@@ -130,7 +129,7 @@ protected
     output list<Integer> outLIndx;
   protected
     list<Integer> list;
-    array<Integer>array:=listArray(inLIndx);
+    array<Integer>array=listArray(inLIndx);
     Integer val,helpVar,iterVar;
   algorithm
     list:=inLIndx;
@@ -143,11 +142,11 @@ protected
         while iterVar>1 and listGet(list,iterVar-1)>val loop
           helpVar:=listGet(list,(iterVar+0));
           array[(iterVar+0)]:=listGet(list,(iterVar-1));
-          indxArray[iterVar-1]:=helpVar;
+          array[iterVar-1]:=helpVar;
           iterVar:=iterVar-1;
         end while;
-        indxArray[(iterVar+0)]:=val;
-        outlindx:=arrayList(indxArray);
+        array[(iterVar+0)]:=val;
+        outLIndx:=arrayList(array);
       end for;
     end if;
   end addIndx2list;
