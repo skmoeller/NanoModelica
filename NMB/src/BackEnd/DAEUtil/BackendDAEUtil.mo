@@ -33,7 +33,7 @@ algorithm
   sizeEquations:=inEquations.size;
   outAdjacencyMatrix:=arrayCreate(sizeEquations,{});
   outAdjacencyMatrixT:=arrayCreate(sizeEquations,{});
-  for i in inEquations.size:-1:1 loop
+  for i in sizeEquations:-1:1 loop
     iterVar:=i;
     outAdjacencyMatrix[iterVar]:=setAdjacency(inVariables,inEquations.equations[iterVar]);
     outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[iterVar],iterVar,sizeEquations);
@@ -55,11 +55,12 @@ protected
     input DAE.Equation inEqn;
     output list<Integer> outList;
   algorithm
-    outList:=getList(DAE.BINARY(inEqn.lhs,DAE.SUB(),inEqn.rhs),inVar);
+    outList:=getList(inEqn.lhs,inEqn.rhs,inVar);
   end setAdjacency;
 
   function getList
-    input DAE.Exp inEqn;
+    input DAE.Exp lhs;
+    input DAE.Exp rhs;
     input DAE.VariableArray inVar;
     output list<Integer> lIndx;
   protected
@@ -68,7 +69,8 @@ protected
   algorithm
     lIndx:={};
     crefs:={};
-    crefs:=treeSearch(inEqn,crefs);
+    crefs:=treeSearch(lhs,crefs);
+    crefs:=crefs::treeSearch(rhs,crefs);
     while listLength(crefs)>0 loop
     crefs:=match(crefs)
     local list<DAE.ComponentRef> lc;
