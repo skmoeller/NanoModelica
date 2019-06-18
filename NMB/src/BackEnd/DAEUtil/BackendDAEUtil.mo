@@ -36,7 +36,7 @@ algorithm
   for i in inEquations.size:-1:1 loop
     iterVar:=i;
     outAdjacencyMatrix[iterVar]:=setAdjacency(inVariables,inEquations.equations[iterVar]);
-    outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[iterVar],iterVar,sizeEquations);
+   // outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[iterVar],iterVar,sizeEquations);
   end for;
 end adjacencyMatrix;
 
@@ -69,7 +69,6 @@ protected
     lIndx:={};
     crefs:={};
     crefs:=treeSearch(inEqn,crefs);
-    print(String(lenghtList(crefs)));
     _:=match(crefs)
     local list<DAE.ComponentRef> lc;
           DAE.ComponentRef c;
@@ -115,7 +114,7 @@ protected
     then "";
     case DAE.CREF(cref)
      algorithm
-       outListCrefs:=cref.id::inListCrefs;
+       outListCrefs:=cref::inListCrefs;
     then "";
     else
       algorithm
