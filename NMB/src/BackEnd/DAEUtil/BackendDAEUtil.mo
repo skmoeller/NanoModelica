@@ -29,16 +29,17 @@ function adjacencyMatrix
   output DAE.AdjacencyMatrix outAdjacencyMatrix;
   output DAE.AdjacencyMatrix outAdjacencyMatrixT;
 protected
-  list<Integer>listVariables;
   Integer sizeEquations;
+  Integer iterVar;
 algorithm
   sizeEquations:=inEquations.size;
   outAdjacencyMatrix:=arrayCreate(sizeEquations,{});
   outAdjacencyMatrixT:=arrayCreate(sizeEquations,{});
-  for i in inEquations.size:-1:1 loop
-    outAdjacencyMatrix[i]:=setAdjacency(inVariables,inEquations.equations[i]);
-    outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[i],i,sizeEquations);
-  end for;
+  /*for i in inEquations.size:-1:1 loop
+    iterVar:=i;
+    outAdjacencyMatrix[iterVar]:=setAdjacency(inVariables,inEquations.equations[iterVar]);
+    outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[iterVar],iterVar,sizeEquations);
+  end for;*/
 end adjacencyMatrix;
 
 /*
@@ -64,17 +65,24 @@ protected
     input DAE.VariableArray inVar;
     output list<Integer> lIndx;
   protected
-    Integer indx;
+    Integer indx,iterVar;
     list<DAE.ComponentRef> crefs;
   algorithm
     lIndx:={};
+    crefs:={};
     crefs:=treeSearch(inEqn,crefs);
-    for c in crefs loop
-      (indx,_):=BackendVariable.getVariableByCref(c,inVar);
-      if not listMember(indx,lIndx) then
-        lIndx:=addIndx2list(indx::lIndx,indx);
-      end if;
-    end for;
+    _:=match(crefs)
+    local list<DAE.ComponentRef> lc;
+          DAE.ComponentRef c;
+      case c::lc
+      algorithm
+        (indx,_):=BackendVariable.getVariableByCref(c,inVar);
+        if not listMember(indx,lIndx) then
+          lIndx:=addIndx2list(indx::lIndx,indx);
+        end if;
+      then "";
+      else then "";
+    end match;
   end getList;
 
   function treeSearch
@@ -118,7 +126,6 @@ protected
     input list<Integer> inlindx;
     input Integer indx;
     output list<Integer> outlindx;
-
   protected
     array<Integer> indxArray;
     list<Integer> restlist;
@@ -147,9 +154,15 @@ function setAdjacencyT
   output DAE.AdjacencyMatrix outAdjacencyT;
 algorithm
   outAdjacencyT:=arrayCreate(sizeEquations,{});
-  for i in variableList loop
-    outAdjacencyT[i]:=equationIndex::inAdjacencyT[i];
-  end for;
+  _:=match(variableList)
+    local Integer var;
+          list<Integer>rList;
+    case var::rList
+      algorithm
+        outAdjacencyT[var]:=equationIndex::inAdjacencyT[var];
+    then "";
+    else then "";
+    end match;
   end setAdjacencyT;
 
 end BackendDAEUtil;
