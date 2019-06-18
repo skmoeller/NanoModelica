@@ -99,8 +99,8 @@ protected
             DAE.ComponentRef cref;
     case DAE.BINARY(exp1,_,exp2)
     algorithm
-      outListCrefs:=treeSearch(exp2,inListCrefs);
-      outListCrefs:=treeSearch(exp1,outListCrefs);
+      outListCrefs:=treeSearch(exp1,inListCrefs);
+      outListCrefs:=treeSearch(exp2,outListCrefs);
       then "";
     case DAE.UNARY(_,exp1)
     algorithm
@@ -108,13 +108,16 @@ protected
       then "";
     case DAE.CALL(_,lExp)
       algorithm
+        exp1:=listGet(lExp,1);
+        lExp:=listDelete(lExp,1);
+        outListCrefs:=treeSearch(expr,inListCrefs);
         while listLength(lExp)>0 loop
           lExp:=match(lExp)
             local DAE.Exp expr;
                   list<DAE.Exp> lexpr;
           case expr::lexpr
           algorithm
-            outListCrefs:=treeSearch(expr,inListCrefs);
+            outListCrefs:=treeSearch(expr,outListCrefs);
           then lexpr;
           else then {};
           end match;
