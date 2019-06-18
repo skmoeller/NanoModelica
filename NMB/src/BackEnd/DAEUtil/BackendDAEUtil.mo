@@ -69,7 +69,8 @@ protected
     lIndx:={};
     crefs:={};
     crefs:=treeSearch(inEqn,crefs);
-    _:=match(crefs)
+    while listLength(crefs)>0 loop
+    crefs:=match(crefs)
     local list<DAE.ComponentRef> lc;
           DAE.ComponentRef c;
       case c::lc
@@ -79,9 +80,10 @@ protected
           /*lIndx:=addIndx2list(indx::lIndx);*/
           lIndx:=indx::lIndx;
         end if;
-      then "";
-      else then "";
+      then lc;
+    else then {};
     end match;
+  end while;
   end getList;
 
   function treeSearch
