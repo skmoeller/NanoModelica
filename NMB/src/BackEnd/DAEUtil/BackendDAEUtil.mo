@@ -76,9 +76,11 @@ protected
       case c::lc
       algorithm
         (indx,_):=BackendVariable.getVariableByCref(c,inVar);
-        if not listMember(indx,lIndx) then
-          /*lIndx:=addIndx2list(indx::lIndx);*/
-          lIndx:=indx::lIndx;
+        if indx>0 then
+          if not listMember(indx,lIndx) then
+            /*lIndx:=addIndx2list(indx::lIndx);*/
+            lIndx:=indx::lIndx;
+          end if;
         end if;
       then lc;
     else then {};
@@ -156,17 +158,22 @@ function setAdjacencyT
   input Integer equationIndex;
   input Integer sizeEquations;
   output DAE.AdjacencyMatrix outAdjacencyT;
+protected
+  list<Integer> list;
 algorithm
+  list:=variableList;
   outAdjacencyT:=arrayCreate(sizeEquations,{});
-  _:=match(variableList)
-    local Integer var;
-          list<Integer>rList;
-    case var::rList
-      algorithm
-        outAdjacencyT[var]:=equationIndex::inAdjacencyT[var];
-    then "";
-    else then "";
+  while listLength(list)>0 loop
+    list:=match(variableList)
+      local Integer var;
+            list<Integer>rList;
+         case var::rList
+         algorithm
+          outAdjacencyT[var]:=equationIndex::inAdjacencyT[var];
+         then rList;
+       else then {};
     end match;
+  end while;
   end setAdjacencyT;
 
 end BackendDAEUtil;
