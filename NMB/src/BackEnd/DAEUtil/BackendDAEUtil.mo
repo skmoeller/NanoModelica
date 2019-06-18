@@ -69,6 +69,7 @@ protected
     lIndx:={};
     crefs:={};
     crefs:=treeSearch(inEqn,crefs);
+    print(String(lenghtList(crefs)));
     _:=match(crefs)
     local list<DAE.ComponentRef> lc;
           DAE.ComponentRef c;
@@ -114,7 +115,7 @@ protected
     then "";
     case DAE.CREF(cref)
      algorithm
-       outListCrefs:=cref::inListCrefs;
+       outListCrefs:=cref.id::inListCrefs;
     then "";
     else
       algorithm
