@@ -164,7 +164,7 @@ algorithm
   list:=variableList;
   outAdjacencyT:=inAdjacencyT;
   while listLength(list)>0 loop
-    list:=match(variableList)
+    list:=match(list)
       local Integer var;
             list<Integer>rList;
          case var::rList
