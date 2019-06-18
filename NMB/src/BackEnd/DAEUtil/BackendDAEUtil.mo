@@ -110,7 +110,7 @@ protected
       algorithm
         exp1:=listGet(lExp,1);
         lExp:=listDelete(lExp,1);
-        outListCrefs:=treeSearch(expr,inListCrefs);
+        outListCrefs:=treeSearch(exp1,inListCrefs);
         while listLength(lExp)>0 loop
           lExp:=match(lExp)
             local DAE.Exp expr;
