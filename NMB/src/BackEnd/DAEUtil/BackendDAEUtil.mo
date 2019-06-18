@@ -76,7 +76,8 @@ protected
       algorithm
         (indx,_):=BackendVariable.getVariableByCref(c,inVar);
         if not listMember(indx,lIndx) then
-         /* lIndx:=addIndx2list(indx::lIndx,indx);*/
+          /*lIndx:=addIndx2list(indx::lIndx);*/
+          lIndx:=indx::lIndx;
         end if;
       then "";
       else then "";
@@ -123,13 +124,10 @@ protected
     end match;
   end treeSearch;
 
-  function addIndx2list
+  /*function addIndx2list
     input list<Integer> inLIndx;
-    input Integer indx;
     output list<Integer> outLIndx;
   protected
-    list<Integer> list;
-    array<Integer>array=listArray(inLIndx);
     Integer val,helpVar,iterVar;
   algorithm
     list:=inLIndx;
@@ -138,18 +136,17 @@ protected
     else
       for i in 2:listLength(inLIndx) loop
         iterVar:=i;
-        val:=listGet(list,iterVar);
-        while iterVar>1 and listGet(list,iterVar-1)>val loop
-          helpVar:=listGet(list,(iterVar+0));
+        val:=listGet(outLIndx,iterVar);
+        while iterVar>1 and listGet(outLIndx,iterVar-1)>val loop
+          helpVar:=listGet(outLIndx,(iterVar+0));
           array[(iterVar+0)]:=listGet(list,(iterVar-1));
           array[iterVar-1]:=helpVar;
           iterVar:=iterVar-1;
         end while;
         array[(iterVar+0)]:=val;
-        outLIndx:=arrayList(array);
       end for;
     end if;
-  end addIndx2list;
+  end addIndx2list;*/
 
 function setAdjacencyT
   input DAE.AdjacencyMatrix inAdjacencyT;
