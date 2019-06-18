@@ -22,8 +22,6 @@ public
  stuff to calculate Adjacency matrix
 ******************************************************************/
 function adjacencyMatrix
-"
-"
   input DAE.VariableArray inVariables;
   input DAE.EquationArray inEquations;
   output DAE.AdjacencyMatrix outAdjacencyMatrix;
