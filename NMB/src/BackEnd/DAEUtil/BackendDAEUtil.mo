@@ -69,7 +69,6 @@ protected
     lIndx:={};
     crefs:={};
     crefs:=treeSearch(inEqn,crefs);
-    crefs:={};
     _:=match(crefs)
     local list<DAE.ComponentRef> lc;
           DAE.ComponentRef c;
