@@ -69,6 +69,7 @@ protected
     lIndx:={};
     crefs:={};
     crefs:=treeSearch(inEqn,crefs);
+    crefs:={};
     _:=match(crefs)
     local list<DAE.ComponentRef> lc;
           DAE.ComponentRef c;
@@ -89,12 +90,17 @@ protected
     output list<DAE.ComponentRef> outListCrefs;
   algorithm
     _:=match(inEqn)
-      local DAE.Exp exp1;
+      local DAE.Exp exp1,exp2;
             list<DAE.Exp> lExp;
             DAE.ComponentRef cref;
-    case DAE.CREF(cref)
+    case DAE.BINARY(exp1,_,exp2)
     algorithm
-      outListCrefs:=cref::inListCrefs;
+      outListCrefs:=treeSearch(exp1,inListCrefs);
+      outListCrefs:=treeSearch(exp2,outListCrefs);
+      then "";
+    case DAE.UNARY(_,exp1)
+    algorithm
+      outListCrefs:=treeSearch(exp1,inListCrefs);
       then "";
     case DAE.CALL(_,lExp)
       algorithm
@@ -107,19 +113,14 @@ protected
           then "";
       end match;
     then "";
-    case DAE.BINARY(exp1,_,_)
+    case DAE.CREF(cref)
+     algorithm
+       outListCrefs:=cref::inListCrefs;
+    then "";
+    else
       algorithm
-        outListCrefs:=treeSearch(exp1,inListCrefs);
-      then "";
-    case DAE.BINARY(_,_,exp1)
-      algorithm
-        outListCrefs:=treeSearch(exp1,inListCrefs);
-      then "";
-    case DAE.UNARY(_,exp1)
-      algorithm
-        outListCrefs:=treeSearch(exp1,inListCrefs);
-      then "";
-    else then "";
+        outListCrefs:=inListCrefs;
+    then "";
     end match;
   end treeSearch;
 
