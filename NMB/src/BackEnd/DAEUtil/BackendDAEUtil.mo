@@ -69,6 +69,13 @@ protected
     lIndx:={};
     crefs:={};
     crefs:=treeSearch(inEqn,crefs);
+    for c in crefs loop
+      (indx,_):=BackendVariable.getVariableByCref(c,inVar);
+      if not listMember(indx,lIndx) and indx>0 then
+        lIndx:=addIndx2list(indx::lIndx);
+      end if;
+    end for;
+    /*
     while listLength(crefs)>0 loop
     crefs:=match(crefs)
     local list<DAE.ComponentRef> lc;
@@ -84,6 +91,7 @@ protected
     else then {};
     end match;
   end while;
+  */
   end getList;
 
   function treeSearch
@@ -174,18 +182,6 @@ algorithm
     var:=i;
     outAdjacencyT[var]:=equationIndex::inAdjacencyT[var];
   end for;
-  /*
-  while listLength(list)>0 loop
-    list:=match(list)
-      local Integer var;
-            list<Integer>rList;
-         case var::rList
-         algorithm
-          outAdjacencyT[var]:=equationIndex::inAdjacencyT[var];
-         then rList;
-       else then {};
-    end match;
-  end while;*/
   end setAdjacencyT;
 
 end BackendDAEUtil;
