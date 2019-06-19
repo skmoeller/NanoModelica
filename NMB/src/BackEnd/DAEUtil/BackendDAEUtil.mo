@@ -75,23 +75,6 @@ protected
         lIndx:=addIndx2list(indx::lIndx);
       end if;
     end for;
-    /*
-    while listLength(crefs)>0 loop
-    crefs:=match(crefs)
-    local list<DAE.ComponentRef> lc;
-          DAE.ComponentRef c;
-      case c::lc
-      algorithm
-        (indx,_):=BackendVariable.getVariableByCref(c,inVar);
-        if not listMember(indx,lIndx) and indx>0 then
-          lIndx:=addIndx2list(indx::lIndx);
-        //lIndx:=indx::lIndx;
-        end if;
-      then lc;
-    else then {};
-    end match;
-  end while;
-  */
   end getList;
 
   function treeSearch
@@ -107,27 +90,19 @@ protected
     algorithm
       outListCrefs:=treeSearch(exp1,inListCrefs);
       outListCrefs:=treeSearch(exp2,outListCrefs);
-      then "";
+    then "";
     case DAE.UNARY(_,exp1)
     algorithm
       outListCrefs:=treeSearch(exp1,inListCrefs);
-      then "";
+    then "";
     case DAE.CALL(_,lExp)
       algorithm
         exp1:=listGet(lExp,1);
         lExp:=listDelete(lExp,1);
         outListCrefs:=treeSearch(exp1,inListCrefs);
-        while listLength(lExp)>0 loop
-          lExp:=match(lExp)
-            local DAE.Exp expr;
-                  list<DAE.Exp> lexpr;
-          case expr::lexpr
-          algorithm
-            outListCrefs:=treeSearch(expr,outListCrefs);
-          then lexpr;
-          else then {};
-          end match;
-        end while;
+        for e in lExp loop
+          outListCrefs:=treeSearch(expr,outListCrefs);
+        end for;
     then "";
     case DAE.CREF(cref)
      algorithm
