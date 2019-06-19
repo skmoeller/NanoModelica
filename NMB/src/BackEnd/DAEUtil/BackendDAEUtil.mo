@@ -22,20 +22,26 @@ public
  stuff to calculate Adjacency matrix
 ******************************************************************/
 function adjacencyMatrix
-  input DAE.VariableArray inVariables;
-  input DAE.EquationArray inEquations;
-  output DAE.AdjacencyMatrix outAdjacencyMatrix;
-  output DAE.AdjacencyMatrix outAdjacencyMatrixT;
+  "Funktion bestimmt zeilenweise die Adjazenzmatrix, wobei diese von Oben
+   nach Unten aufgebaut wird.
+   Außerdem wird gleichzeitig die transponierte Adjazenzmatrix aufgebaut."
+  input DAE.VariableArray inVariables; /*Variablen Array*/
+  input DAE.EquationArray inEquations; /*Gleichungen Array*/
+  output DAE.AdjacencyMatrix outAdjacencyMatrix; /*Adjazenzmatrix*/
+  output DAE.AdjacencyMatrix outAdjacencyMatrixT; /*Transponierte Adjazenzmatrix*/
 protected
-  Integer sizeEquations;
-  Integer iterVar;
+  Integer sizeEquations; /*Variabeln fuer Anzahl Gleichungen */
+  Integer iterVar;/*Variable fuer die Iteration*/
 algorithm
   sizeEquations:=inEquations.size;
+  /*Initialisierung der Matrizen*/
   outAdjacencyMatrix:=arrayCreate(sizeEquations,{});
   outAdjacencyMatrixT:=arrayCreate(sizeEquations,{});
   for i in sizeEquations:-1:1 loop
     iterVar:=i;
+    /*Setze Zeile von Adjazenzmatrix*/
     outAdjacencyMatrix[iterVar]:=setAdjacency(inVariables,inEquations.equations[iterVar]);
+    /*Mit Zeile aus Adjazenzmatrix wird stueckweise die transponierte Matrix dazu aufgebaut*/
     outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[iterVar],iterVar);
   end for;
 end adjacencyMatrix;
@@ -46,69 +52,83 @@ end adjacencyMatrix;
  *
  */
 protected
-  /*
-  Function sets the Adjacency Matrix
-  Calls treeSearchFunction to look up all variables
-  */
+
   function setAdjacency
-    input DAE.VariableArray inVar;
-    input DAE.Equation inEqn;
-    output list<Integer> outList;
+    "Funktion ruft Routine auf um an Liste fuer entsprechende Gleichung zu kommen"
+    input DAE.VariableArray inVar; /*Variablen Array*/
+    input DAE.Equation inEqn; /*Gleichungen als 'Expressions'*/
+    output list<Integer> outList; /*Liste mit Indizes von vorkommenden Variablen*/
   algorithm
-    outList:=getList(DAE.BINARY(inEqn.lhs,DAE.SUB(),inEqn.rhs),inVar);
+    outList:=getList(DAE.BINARY(inEqn.lhs,DAE.SUB(),inEqn.rhs),inVar); /*Schreibe Gleichung als (lhs-rhs)=0 -> Ein Expression!*/
   end setAdjacency;
 
   function getList
-    input DAE.Exp inEqn;
-    input DAE.VariableArray inVar;
-    output list<Integer> lIndx;
+    "Funktion durchsucht zunaechst den 'Expression-Baum' und gibt alle gefundenen 'crefs'
+    zurueck. Dann folgt Zuweisung von Indizes an entsprechende 'crefs'. Paarweise verschiedene
+    werden anschliessend in Ausgabeliste geschrieben."
+    input DAE.Exp inEqn; /*Gleichungen als 'Expressions'*/
+    input DAE.VariableArray inVar; /*Variablen Array*/
+    output list<Integer> lIndx; /*Liste mit Indizes von vorkommenden VAriablen*/
   protected
-    Integer indx,iterVar;
-    list<DAE.CrefIndex>lcref;
-    list<DAE.ComponentRef> crefs;
+    Integer indx,iterVar; /*indx: Index Variable; iterVar: Iterationsvariable fuer Schleife */
+    list<DAE.ComponentRef> crefs; /*Liste von 'crefs'*/
   algorithm
+    /*Initialisierung der Listen*/
     lIndx:={};
     crefs:={};
+    /*Aufruf Funktion fuer Suchen der 'crefs'*/
     crefs:=treeSearch(inEqn,crefs);
     for c in crefs loop
-      (indx,_):=BackendVariable.getVariableByCref(c,inVar);
+      /*Mit interner Funktion wird Index ueber Hash-Wert bestimmt*/
+      (indx,_):=BackendVariable.getVariableByCref(c,inVar); /*TODO: VARIABLEN DER FORM der.u2 etc. werden nicht erkannt*/
+      /*Falls Index noch nicht in Liste und entsprechender 'cref' 'Variable', wird er hinzugefuegt*/
       if (not listMember(indx,lIndx)) and indx>0 then
+        /*Rufe Funktion zum Hinzufuegen auf*/
         lIndx:=addIndx2list(indx::lIndx);
       end if;
     end for;
   end getList;
 
   function treeSearch
-    input DAE.Exp inEqn;
-    input list<DAE.ComponentRef> inListCrefs;
-    output list<DAE.ComponentRef> outListCrefs;
+    "Funktion fuehrt eine rekursive Durchsuchung des Baumes durch. Es werden alle Zweige bis zu Blaettern
+    abgelaufen. An allen anderen Knoten wird Liste von 'crefs' entsprechend aktuallisiert."
+    input DAE.Exp inEqn; /*Expression welcher nach 'crefs abgesucht wird'*/
+    input list<DAE.ComponentRef> inListCrefs; /*Liste mit bereits gefundenen 'crefs'*/
+    output list<DAE.ComponentRef> outListCrefs; /*Liste mit eventuell neuem 'cref'*/
   algorithm
     _:=match(inEqn)
-      local DAE.Exp exp1,exp2;
-            list<DAE.Exp> lExp;
-            DAE.ComponentRef cref;
+      local DAE.Exp exp1,exp2; /*Locale VAriablen die 'Expression' aufnehmen*/
+            list<DAE.Exp> lExp; /*Liste von 'Expressions'; fuer 3.Fall*/
+            DAE.ComponentRef cref; /*Gesuchter 'cref'*/
+    /*1.Fall: Zwei Ausdruecke mit Rechenoperation: Laufe zunaechst 'linken' Zweig, aktuallisiere Liste, dann 'rechter Zweig'*/
     case DAE.BINARY(exp1,_,exp2)
     algorithm
       outListCrefs:=treeSearch(exp1,inListCrefs);
       outListCrefs:=treeSearch(exp2,outListCrefs);
     then "";
+    /*2.Fall: Ausdruck mit negativem Vorzeichen; Durchsuche Zweig mit dem 'Expression'*/
     case DAE.UNARY(_,exp1)
     algorithm
       outListCrefs:=treeSearch(exp1,inListCrefs);
     then "";
+    /*3.Fall: Funktionsaufruf. Iteriere ueber die Liste mit den 'Expressions' und pruefe diese einzeln*/
     case DAE.CALL(_,lExp)
       algorithm
+        /*1. Element wird herausgeloest->damit Liste entsprechend aktuallisiert werden kann.*/
         exp1:=listGet(lExp,1);
         lExp:=listDelete(lExp,1);
         outListCrefs:=treeSearch(exp1,inListCrefs);
+        /*Iteration ueber Liste->Suche nach 'crefs' in den einzelnen 'Expressions'*/
         for e in lExp loop
           outListCrefs:=treeSearch(e,outListCrefs);
         end for;
     then "";
+    /*4. Fall 'cref' gefunden! Fuege diesen zu Liste hinzu*/
     case DAE.CREF(cref)
      algorithm
        outListCrefs:=cref::inListCrefs;
     then "";
+    /*Sonstige Faelle: Falls Blatt Integer,Real,... ist-> Liste nicht veraendern!*/
     else
       algorithm
         outListCrefs:=inListCrefs;
@@ -117,11 +137,12 @@ protected
   end treeSearch;
 
   function addIndx2list
-    input list<Integer> inList;
-    output list<Integer> outList;
+    "Funktion fuegt Element aufsteigend mittels Insertion-Sort in bereits sortierte Liste ein"
+    input list<Integer> inList; /*Uebergebene Liste mit neuem Index als 1. Element*/
+    output list<Integer> outList;/*Liste mit neuem Index an entsprechender Stelle*/
   protected
-    array<Integer> arr;
-    Integer val,helpVar,iterVar;
+    array<Integer> arr;/*Hilfsarry um ueber Elemente zu iterieren*/
+    Integer val,helpVar,iterVar; /*Variablen fuer Insertion-Sort*/
   algorithm
     if listLength(inList)<2 then
       outList:=inList;
@@ -143,12 +164,14 @@ protected
   end addIndx2list;
 
 function setAdjacencyT
-  input DAE.AdjacencyMatrix inAdjacencyT;
-  input list<Integer> variableList;
-  input Integer equationIndex;
-  output DAE.AdjacencyMatrix outAdjacencyT;
+  "Funktion setzt einige Elemente der transponierten Adjazenzmatrix.
+  Jede Zeile, welche in der Eingabe Liste vorkommt, erhaelt entsrechenden Gleichungsindex."
+  input DAE.AdjacencyMatrix inAdjacencyT;/*Alte transponierte Adjazenzmatrix*/
+  input list<Integer> variableList; /*Liste von Variabeln die in Gleichung mit Index 'equationIndex' vorkommen*/
+  input Integer equationIndex; /*Aktuell betrachtet Gleichung*/
+  output DAE.AdjacencyMatrix outAdjacencyT; /*Aktuallisierte Adjazenzmatrix*/
 protected
-  Integer var;
+  Integer var; /*Iterationvariable*/
 algorithm
   outAdjacencyT:=inAdjacencyT;
   for i in variableList; loop
