@@ -101,7 +101,7 @@ protected
         lExp:=listDelete(lExp,1);
         outListCrefs:=treeSearch(exp1,inListCrefs);
         for e in lExp loop
-          outListCrefs:=treeSearch(expr,outListCrefs);
+          outListCrefs:=treeSearch(e,outListCrefs);
         end for;
     then "";
     case DAE.CREF(cref)
