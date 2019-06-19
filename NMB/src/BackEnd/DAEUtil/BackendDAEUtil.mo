@@ -174,7 +174,7 @@ protected
   Integer var; /*Iterationvariable*/
 algorithm
   outAdjacencyT:=inAdjacencyT;
-  for i in variableList; loop
+  for i in variableList loop
     var:=i;
     outAdjacencyT[var]:=equationIndex::inAdjacencyT[var];
   end for;
