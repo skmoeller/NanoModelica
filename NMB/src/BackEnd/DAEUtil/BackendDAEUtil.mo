@@ -63,14 +63,21 @@ protected
     input DAE.VariableArray inVar;
     output list<Integer> lIndx;
   protected
-    Integer indx,iterVar;
+    Integer indx,hash,iterVar;
+    list<DAE.CrefIndex>lcref;
     list<DAE.ComponentRef> crefs;
   algorithm
     lIndx:={};
     crefs:={};
     crefs:=treeSearch(inEqn,crefs);
     for c in crefs loop
-      (indx,_):=BackendVariable.getVariableByCref(c,inVar);
+      hash:=ComponentRef.hashComponentRef(c);
+      try
+      lcref:=inVar.variableIndices[hash];
+      indx:=getIndex(lcref,c);
+      else
+        indx:=-1;
+      end try;
       if not listMember(indx,lIndx) and indx>0 then
         lIndx:=addIndx2list(indx::lIndx);
       end if;
@@ -114,6 +121,18 @@ protected
     then "";
     end match;
   end treeSearch;
+
+  function getIndex
+    input list<DAE.CrefIndex>lCrefIdx;
+    input DAE.ComponentRef cref;
+    output Integer index;
+  algorithm
+    for crefIndx in lCrefIdx loop
+      if ComponentRef.compareCrefNoStr(crefIndx.cref,cref) then
+        index:=crefIndx.index;
+      end if;
+    end for;
+  end getIndex;
 
   function addIndx2list
     input list<Integer> inList;
