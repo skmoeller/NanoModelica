@@ -80,7 +80,7 @@ protected
     crefs:=treeSearch(inEqn,crefs);
     for c in crefs loop
       /*Mit interner Funktion wird Index ueber Hash-Wert bestimmt*/
-      (indx,_):=BackendVariable.getVariableByCref(c,inVar); /*TODO: VARIABLEN DER FORM der.u2 etc. werden nicht erkannt*/
+      (indx,_):=BackendVariable.getVariableByCref(c,inVar); /*TODO: VARIABLEN DER FORM der.u2 etc. werden in UNIX nicht erkannt*/
       /*Falls Index noch nicht in Liste und entsprechender 'cref' 'Variable', wird er hinzugefuegt*/
       if (not listMember(indx,lIndx)) and indx>0 then
         /*Rufe Funktion zum Hinzufuegen auf*/
