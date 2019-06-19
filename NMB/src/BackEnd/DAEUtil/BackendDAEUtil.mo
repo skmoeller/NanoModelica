@@ -166,9 +166,15 @@ function setAdjacencyT
   output DAE.AdjacencyMatrix outAdjacencyT;
 protected
   list<Integer> list;
+  Integer var;
 algorithm
   list:=variableList;
   outAdjacencyT:=inAdjacencyT;
+  for i in list loop
+    var:=i;
+    outAdjacencyT[var]:=equationIndex::inAdjacencyT[var];
+  end for;
+  /*
   while listLength(list)>0 loop
     list:=match(list)
       local Integer var;
@@ -179,7 +185,7 @@ algorithm
          then rList;
        else then {};
     end match;
-  end while;
+  end while;*/
   end setAdjacencyT;
 
 end BackendDAEUtil;
