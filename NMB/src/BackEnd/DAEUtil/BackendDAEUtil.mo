@@ -75,12 +75,10 @@ protected
       try
       lcref:=inVar.variableIndices[hash];
       indx:=getIndex(lcref,c);
-      else
-        indx:=-1;
-      end try;
-      if not listMember(indx,lIndx) and indx>0 then
+      if not listMember(indx,lIndx) then
         lIndx:=addIndx2list(indx::lIndx);
       end if;
+      end try;
     end for;
   end getList;
 
