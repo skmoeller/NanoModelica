@@ -36,7 +36,7 @@ algorithm
   for i in sizeEquations:-1:1 loop
     iterVar:=i;
     outAdjacencyMatrix[iterVar]:=setAdjacency(inVariables,inEquations.equations[iterVar]);
-    outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[iterVar],iterVar,sizeEquations);
+    outAdjacencyMatrixT:=setAdjacencyT(outAdjacencyMatrixT,outAdjacencyMatrix[iterVar],iterVar);
   end for;
 end adjacencyMatrix;
 
@@ -63,7 +63,7 @@ protected
     input DAE.VariableArray inVar;
     output list<Integer> lIndx;
   protected
-    Integer indx,hash,iterVar;
+    Integer indx,iterVar;
     list<DAE.CrefIndex>lcref;
     list<DAE.ComponentRef> crefs;
   algorithm
@@ -71,7 +71,7 @@ protected
     crefs:={};
     crefs:=treeSearch(inEqn,crefs);
     for c in crefs loop
-      indx:=BackendVariable.getVariableByCref(c,inVar);
+      (indx,_):=BackendVariable.getVariableByCref(c,inVar);
       if (not listMember(indx,lIndx)) and indx>0 then
         lIndx:=addIndx2list(indx::lIndx);
       end if;
@@ -146,15 +146,12 @@ function setAdjacencyT
   input DAE.AdjacencyMatrix inAdjacencyT;
   input list<Integer> variableList;
   input Integer equationIndex;
-  input Integer sizeEquations;
   output DAE.AdjacencyMatrix outAdjacencyT;
 protected
-  list<Integer> list;
   Integer var;
 algorithm
-  list:=variableList;
   outAdjacencyT:=inAdjacencyT;
-  for i in list loop
+  for i in variableList; loop
     var:=i;
     outAdjacencyT[var]:=equationIndex::inAdjacencyT[var];
   end for;
