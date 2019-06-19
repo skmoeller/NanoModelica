@@ -76,9 +76,9 @@ protected
       case c::lc
       algorithm
         (indx,_):=BackendVariable.getVariableByCref(c,inVar);
-        if not listMember(indx,lIndx) then
-        /*lIndx:=addIndx2list(indx::lIndx);*/
-        lIndx:=indx::lIndx;
+        if not listMember(indx,lIndx) and index>0 then
+          lIndx:=addIndx2list(indx::lIndx);
+        //lIndx:=indx::lIndx;
         end if;
       then lc;
     else then {};
@@ -132,29 +132,31 @@ protected
     end match;
   end treeSearch;
 
-  /*function addIndx2list
-    input list<Integer> inLIndx;
-    output list<Integer> outLIndx;
+  function addIndx2list
+    input list<Integer> inList;
+    output list<Integer> outList;
   protected
+    array<Integer> arr;
     Integer val,helpVar,iterVar;
   algorithm
-    list:=inLIndx;
-    if listLength(inLIndx)<2 then
-      outLIndx:=inLIndx;
+    if listLength(inList)<2 then
+      outList:=inList;
     else
-      for i in 2:listLength(inLIndx) loop
+      arr:=listArray(inList);
+      for i in 2:listLength(inList) loop
         iterVar:=i;
-        val:=listGet(outLIndx,iterVar);
-        while iterVar>1 and listGet(outLIndx,iterVar-1)>val loop
-          helpVar:=listGet(outLIndx,(iterVar+0));
-          array[(iterVar+0)]:=listGet(list,(iterVar-1));
-          array[iterVar-1]:=helpVar;
+        val:=arr[iterVar];
+        while iterVar>1 and arr[iterVar-1]>val loop
+          helpVar:=arr[iterVar+0];
+          arr[iterVar+0]:=arr[iterVar-1];
+          arr[iterVar-1]:=helpVar;
           iterVar:=iterVar-1;
         end while;
-        array[(iterVar+0)]:=val;
+        arr[iterVar+0]:=val;
       end for;
+      outList:=arrayList(arr);
     end if;
-  end addIndx2list;*/
+  end addIndx2list;
 
 function setAdjacencyT
   input DAE.AdjacencyMatrix inAdjacencyT;
