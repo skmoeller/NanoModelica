@@ -66,7 +66,7 @@ protected
     "Funktion durchsucht zunaechst den 'Expression-Baum' und gibt alle gefundenen 'crefs'
     zurueck. Dann folgt Zuweisung von Indizes an entsprechende 'crefs'. Paarweise verschiedene
     werden anschliessend in Ausgabeliste geschrieben."
-    input DAE.Exp inEqn; /*Gleichungen als 'Expressions'*/
+    input DAE.Exp inExpr; /*Gleichung als einzelner 'Expressions' geschrieben*/
     input DAE.VariableArray inVar; /*Variablen Array*/
     output list<Integer> lIndx; /*Liste mit Indizes von vorkommenden VAriablen*/
   protected
@@ -77,7 +77,7 @@ protected
     lIndx:={};
     crefs:={};
     /*Aufruf Funktion fuer Suchen der 'crefs'*/
-    crefs:=treeSearch(inEqn,crefs);
+    crefs:=treeSearch(inExpr,crefs);
     for c in crefs loop
       /*Mit interner Funktion wird Index ueber Hash-Wert bestimmt*/
       (indx,_):=BackendVariable.getVariableByCref(c,inVar); /*TODO: VARIABLEN DER FORM der.u2 etc. werden in UNIX nicht erkannt*/
@@ -92,11 +92,11 @@ protected
   function treeSearch
     "Funktion fuehrt eine rekursive Durchsuchung des Baumes durch. Es werden alle Zweige bis zu Blaettern
     abgelaufen. An allen anderen Knoten wird Liste von 'crefs' entsprechend aktuallisiert."
-    input DAE.Exp inEqn; /*Expression welcher nach 'crefs abgesucht wird'*/
+    input DAE.Exp inExpr; /*Expression welcher nach 'crefs abgesucht wird'*/
     input list<DAE.ComponentRef> inListCrefs; /*Liste mit bereits gefundenen 'crefs'*/
     output list<DAE.ComponentRef> outListCrefs; /*Liste mit eventuell neuem 'cref'*/
   algorithm
-    _:=match(inEqn)
+    _:=match(inExpr)
       local DAE.Exp exp1,exp2; /*Locale VAriablen die 'Expression' aufnehmen*/
             list<DAE.Exp> lExp; /*Liste von 'Expressions'; fuer 3.Fall*/
             DAE.ComponentRef cref; /*Gesuchter 'cref'*/
