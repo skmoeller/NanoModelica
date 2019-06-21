@@ -4,31 +4,36 @@ package Matching
   description: Matching contains functions for matching algorithms"
 
 import DAE;
+import Array;
+import List;
 
 function PerfectMatching "
   This function fails if there is no perfect matching for the given system."
   input  DAE.AdjacencyMatrix m;
   output DAE.Matching matching;
 protected
+  array<Integer> assign;
   Integer sizeEquations,eqnIdx;
   array<Boolean> vMark;
   array<Boolean> eMark;
   Boolean success;
 algorithm
-  sizeEquations:=arrayLenght(m);
-  matching.variableAssign:=arrayCreate(sizeEquations,0);
-  matching.equationAssign:=arrayCreate(sizeEquations,0);
+  sizeEquations:=arrayLength(m);
+  matching:=DAE.MATCHING(arrayCreate(sizeEquations,0),arrayCreate(sizeEquations,0));
   vMark:=arrayCreate(sizeEquations,false);
   eMark:=arrayCreate(sizeEquations,false);
-  for i in 1:sizeEquation loop
+  assign:=arrayCreate(sizeEquations,0);
+  for i in 1:sizeEquations loop
     eqnIdx:=i;
-    (vMark,eMark,matching.variableAssign,success):=pathFound(eqnIdx,sizeEquations,vMark,matching.variableAssign,m);
+    (vMark,eMark,assign,success):=pathFound(eqnIdx,sizeEquations,vMark,eMark,matching.variableAssign,m);
+    matching.variableAssign:=assign;
     if not success then
       print("singulaer");
-    else if not listMember(false,arrayList(eMark))
-      print("Not all Equation touched");
-    end if
+    end if;
   end for;
+  if listMember(false,arrayList(eMark)) then
+      print("Not all Equation touched");
+  end if;
   matching.equationAssign:=createEquationAssign(matching.variableAssign,sizeEquations);
 end PerfectMatching;
 
@@ -39,12 +44,12 @@ function pathFound
   input array<Boolean> inEquationMark;
   input array<Integer> inVariableAssign;
   input DAE.AdjacencyMatrix adjacency;
-  output array>Boolean> outVariableMark;
+  output array<Boolean> outVariableMark;
   output array<Boolean> outEquationMark;
   output array<Integer> outVariableAssign;
   output Boolean success;
 protected
-  Boolean zeroVarAssign;
+  Boolean zeroAssign;
   Integer variableIdx;
   list<Integer> otherVariables;
   array<Boolean> helpVariableMark;
@@ -54,8 +59,8 @@ algorithm
   outEquationMark:=inEquationMark;
   outVariableAssign:=inVariableAssign;
   outEquationMark[equationIdx]:=true;/*what should this do?????*/
-  (zeroVarAssign,variableIdx):=zeroVariableAssign(equationIdx,adjacency,outVariableAssign)
-  if zeroVarAssign then
+  (variableIdx,zeroAssign):=zeroVariableAssign(equationIdx,adjacency,outVariableAssign);
+  if zeroAssign then
     success:=true;
     outVariableAssign[variableIdx]:=equationIdx;
   else
@@ -63,8 +68,8 @@ algorithm
     otherVariables:=findOtherVariables(equationIdx,adjacency,outVariableMark);
     for j in otherVariables loop
       variableIdx:=j;
-      outVariableMark:=true;
-      (helpVariableMark,_,helpVariableAssign,success):=pathFound(outVariableAssign(variableIdx),sizeEquations,outVariableMark,outEquationMark,outVariableAssign);
+      outVariableMark[variableIdx]:=true;
+      (helpVariableMark,_,helpVariableAssign,success):=pathFound(outVariableAssign[variableIdx],sizeEquations,outVariableMark,outEquationMark,outVariableAssign,adjacency);
       if success then
         outVariableMark:=helpVariableMark;
         outVariableMark:=helpVariableMark;
@@ -81,17 +86,18 @@ function zeroVariableAssign
   input DAE.AdjacencyMatrix adjacency;
   input array<Integer> assign;
   output Integer variableIndex;
-  output Boolean success;
+  output Boolean success=false;
 algorithm
   for i in adjacency[eqnIdx] loop
     variableIndex:=i;
-    if assign[variableIndex]=0 then
+    if assign[variableIndex]==0 then
+      success:=true;
       break;
     end if;
   end for;
 end zeroVariableAssign;
 
-function findOtherVariables(equationIdx,adjacency,outVariableMark);
+function findOtherVariables
   input Integer eqnIdx;
   input DAE.AdjacencyMatrix adjacency;
   input array<Boolean> vMark;
