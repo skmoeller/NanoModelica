@@ -29,7 +29,7 @@ package Data
 
     data2 :=
     DAE_List.EQUATION_ARRAY(2,{DAE_List.EQUATION(DAE_List.CREF(DAE_List.COMPONENT_REF("der",SOME(DAE_List.COMPONENT_REF("v",NONE())))),DAE_List.BINARY(DAE_List.CREF(DAE_List.COMPONENT_REF("f",NONE())),DAE_List.DIV(),DAE_List.CREF(DAE_List.COMPONENT_REF("m",NONE())))),DAE_List.EQUATION(DAE_List.CREF(DAE_List.COMPONENT_REF("der",SOME(DAE_List.COMPONENT_REF("s",NONE())))),DAE_List.CREF(DAE_List.COMPONENT_REF("v",NONE())))});
-    '
+*/
   end getModel;
 
 
