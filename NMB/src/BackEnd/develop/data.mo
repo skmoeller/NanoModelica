@@ -21,8 +21,8 @@ package Data
     /*Testfall 5: Kein Matching moeglich*/
     //data1 := {{1,2,3},{3},{3}};
     /*Testfall 6: Matching ist moeglich, Testfall 1 aus Adjazenz Matrix*/
-    //data1 := {{5},{6},{2},{3},{4,5},{1,2,3,4},{1,7}};
-    /*Testfall 7: Matching ist moeglich, Testfall 3 aus Adjazenz Matrix*/
-    data1 := {{1},{2}};
+    data1 := {{5},{6},{2},{3},{4,5},{1,2,3,4},{1,7}};
+   /*Testfall 7: Matching ist moeglich, Testfall 3 aus Adjazenz Matrix*/
+    //data1 := {{1},{2}};
   end getModel;
 end Data;

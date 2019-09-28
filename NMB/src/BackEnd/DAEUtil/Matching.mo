@@ -30,7 +30,7 @@ algorithm
   /*Schleife ruft jede Gleichung auf und sucht entsprechende Variable mit Funktion 'patchFound'*/
   for i in 1:sizeEquations loop
     eqnIdx:=i;
-    (vMark,eMark,assign,success):=pathFound(eqnIdx,sizeEquations,vMark,eMark,matching.variableAssign,m);
+    (_,eMark,assign,success):=pathFound(eqnIdx,sizeEquations,vMark,eMark,matching.variableAssign,m);
     matching.variableAssign:=assign; /*Aktuelles Ergbnis in 'globale' Variable kopieren*/
     /*Falls kein Matching gefunden, wird Fehler ausgeben*/
     if not success then
