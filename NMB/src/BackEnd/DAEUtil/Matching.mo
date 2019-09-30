@@ -62,7 +62,6 @@ protected
   Boolean zeroAssign; /*Gibt es Variable die noch nicht im Matching ist*/
   Integer variableIdx; /*Index der aktuellen Variabeln*/
   list<Integer> otherVariables; /*Liste mit Variabeln die fuer aktuellen Durchlauf unmarkiert sind*/
-  array<Boolean> helpVariableMark;/*Zwischenspeicher fuer bereits markierte Variablen*/
   array<Integer> helpVariableAssign; /*Zwischenspeicher fuer Matching*/
 algorithm
   /*initialisieren der Variabeln*/
@@ -86,11 +85,9 @@ algorithm
       variableIdx:=j;
       outVariableMark[variableIdx]:=true;
       /*Pruefe von eq ausgehend, andere Moeglichkeiten fuer ein Matching und setze das Matching ggf. neu */
-      (helpVariableMark,_,helpVariableAssign,success):=pathFound(outVariableAssign[variableIdx],sizeEquations,outVariableMark,outEquationMark,outVariableAssign,adjacency);
+(outVariableMark,_,helpVariableAssign,success):=pathFound(outVariableAssign[variableIdx],sizeEquations,outVariableMark,outEquationMark,outVariableAssign,adjacency);
       if success then
         /*Wenn erfolgreich, dann wird das Matching aktualisiert und die aktuelle Gleichung erhaelt entsprechende Variabel*/
-        outVariableMark:=helpVariableMark;
-        outVariableMark:=helpVariableMark;
         outVariableAssign:=helpVariableAssign;
         outVariableAssign[variableIdx]:=equationIdx;
         break; /*Abbruch bei Erfolg*/
